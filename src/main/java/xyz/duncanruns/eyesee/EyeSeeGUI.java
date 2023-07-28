@@ -31,8 +31,6 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private Image image;
     //private final Object imageLock = new Object();
-    private final int width = 60;
-    private final int height = 100;
     private final boolean useForeground = true;
     private final WinDef.HWND eyeSeeHwnd;
     private long lastKeyPress = -1L;
@@ -44,7 +42,7 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         setLocation(options.x, options.y);
         addWindowListener(this);
         setResizable(false);
-        setSize(300, 500);
+        setSize(options.displayWidth(), options.displayHeight());
         setAlwaysOnTop(true);
         String randTitle = "EyeSee " + new Random().nextInt();
         setTitle(randTitle);
@@ -76,25 +74,27 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         if (useForeground) {
             sourceHwnd = new WinDef.HWND(User32.INSTANCE.GetForegroundWindow());
         }
-        Rectangle rectangle = getYoinkArea(sourceHwnd);
+        Rectangle rectangle = getYoinkArea(sourceHwnd, options);
         WinDef.HDC sourceHDC = User32.INSTANCE.GetDC(sourceHwnd);
         WinDef.HDC eyeSeeHDC = User32.INSTANCE.GetDC(eyeSeeHwnd);
 
         GDI32Extra.INSTANCE.SetStretchBltMode(eyeSeeHDC, 3);
 
-        GDI32Extra.INSTANCE.StretchBlt(eyeSeeHDC, 0, 0, 300, 500, sourceHDC, rectangle.x, rectangle.y, rectangle.width, rectangle.height, SRCCOPY);
+        GDI32Extra.INSTANCE.StretchBlt(eyeSeeHDC, 0, 0, options.displayWidth(), options.displayHeight(), sourceHDC, rectangle.x, rectangle.y, rectangle.width, rectangle.height, SRCCOPY);
 
         User32.INSTANCE.ReleaseDC(sourceHwnd, sourceHDC);
         User32.INSTANCE.ReleaseDC(eyeSeeHwnd, eyeSeeHDC);
     }
 
-    private Rectangle getYoinkArea(WinDef.HWND hwnd) {
+    private Rectangle getYoinkArea(WinDef.HWND hwnd, EyeSeeOptions options) {
         Rectangle rectangle;
         if (hwnd == null) {
             rectangle = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
         } else {
             rectangle = HwndUtil.getHwndInnerRectangle(hwnd.getPointer());
         }
+        int width = options.viewportWidth;
+        int height = options.viewportHeight;
         return new Rectangle((int) rectangle.getCenterX() - width / 2, (int) rectangle.getCenterY() - height / 2, width, height);
     }
 

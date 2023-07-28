@@ -15,6 +15,9 @@ public class EyeSeeOptions {
     public int refreshRate = 60;
     public int hotkey = 86; // https://pastebin.com/raw/Wqi3frfi
     public int disappearAfter = 3000;
+    public int viewportWidth = 60;
+    public int viewportHeight = 100;
+    public double scaleFactor = 5.0;
 
     private EyeSeeOptions() {
     }
@@ -58,4 +61,11 @@ public class EyeSeeOptions {
         return GSON.toJson(this);
     }
 
+    public int displayWidth() {
+        return (int) (viewportWidth * scaleFactor);
+    }
+
+    public int displayHeight() {
+        return (int) (viewportHeight * scaleFactor);
+    }
 }
