@@ -19,6 +19,9 @@ public final class KeyboardUtil {
     // Modifier keys which reference only single keys
     public static final List<Integer> SINGLE_MODIFIERS = Arrays.asList(Win32Con.VK_LCONTROL, Win32Con.VK_RCONTROL, Win32Con.VK_LSHIFT, Win32Con.VK_RSHIFT, Win32Con.VK_LMENU, Win32Con.VK_RMENU, Win32Con.VK_F3);
     private static final String[] KEY_NAMES = getKeyNamesArray();
+    //assume a single hotkey
+    private static boolean wasDown = false;
+    private static int pressCount = 0;
 
     private KeyboardUtil() {
     }
@@ -130,6 +133,29 @@ public final class KeyboardUtil {
 
     public static boolean isPressed(int vKey) {
         return User32.INSTANCE.GetAsyncKeyState(vKey) < 0;
+    }
+
+    /**
+     * updates the hotkey pressed state
+     * @param vKey the hotkey
+     */
+    public static void tick(int vKey) {
+        boolean isDown = isPressed(vKey);
+        if (isDown && !wasDown) {
+            pressCount++;
+        }
+        wasDown = isDown;
+    }
+
+    /**
+     *
+     * @return whether the hotkey (defined and updated by {@linkplain KeyboardUtil#tick(int)})
+     * was pressed since the last call
+     */
+    public static boolean wasPressed() {
+        if (pressCount == 0) return false;
+        pressCount--;
+        return true;
     }
 
     /**

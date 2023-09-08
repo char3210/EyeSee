@@ -61,7 +61,9 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
 
     private void tick() {
         EyeSeeOptions options = EyeSeeOptions.getInstance();
-        if (KeyboardUtil.isPressed(options.hotkey)) lastKeyPress = System.currentTimeMillis();
+        KeyboardUtil.tick(options.hotkey);
+        boolean hotkeyPressed = KeyboardUtil.wasPressed();
+        if (hotkeyPressed) lastKeyPress = System.currentTimeMillis();
         if (System.currentTimeMillis() - lastKeyPress > options.disappearAfter) {
             if (currentlyShowing) {
                 System.out.println("Hiding...");
@@ -69,10 +71,18 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
                 HwndUtil.minimize(eyeSeeHwnd.getPointer());
             }
             return;
-        } else if (!currentlyShowing) {
-            System.out.println("Showing...");
-            currentlyShowing = true;
-            HwndUtil.unminimizeNoActivate(eyeSeeHwnd.getPointer());
+        } else if (hotkeyPressed) {
+            currentlyShowing = !currentlyShowing;
+            if (currentlyShowing) {
+                System.out.println("Showing...");
+                currentlyShowing = true;
+                HwndUtil.unminimizeNoActivate(eyeSeeHwnd.getPointer());
+            } else {
+                System.out.println("Hiding...");
+                currentlyShowing = false;
+                HwndUtil.minimize(eyeSeeHwnd.getPointer());
+                return;
+            }
         }
 
         WinDef.HWND sourceHwnd = null;
