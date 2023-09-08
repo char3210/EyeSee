@@ -14,6 +14,7 @@ public class EyeSeeOptions {
     public int y = 0;
     public int refreshRate = 60;
     public int hotkey = 86; // https://pastebin.com/raw/Wqi3frfi
+    public boolean useToggle = false;
     public int disappearAfter = 3000;
     public int viewportWidth = 60;
     public int viewportHeight = 100;
@@ -42,6 +43,12 @@ public class EyeSeeOptions {
         return Paths.get(System.getProperty("user.home")).resolve(".EyeSee").resolve("options.json");
     }
 
+    private static void ensureEyeSeeDir() {
+        // Special care is needed to make a .EyeSee folder for some reason...
+        // Using Files.createDirectories on a path.getParent() would create .EyeSee as a file for some reason.
+        new File((System.getProperty("user.home") + "/.EyeSee/").replace("\\", "/").replace("//", "/")).mkdirs();
+    }
+
     public void save() {
         ensureEyeSeeDir();
         try {
@@ -49,12 +56,6 @@ public class EyeSeeOptions {
         } catch (Exception ignored) {
             System.out.println("Error saving D:");
         }
-    }
-
-    private static void ensureEyeSeeDir() {
-        // Special care is needed to make a .EyeSee folder for some reason...
-        // Using Files.createDirectories on a path.getParent() would create .EyeSee as a file for some reason.
-        new File((System.getProperty("user.home") + "/.EyeSee/").replace("\\", "/").replace("//", "/")).mkdirs();
     }
 
     public String getJsonString() {

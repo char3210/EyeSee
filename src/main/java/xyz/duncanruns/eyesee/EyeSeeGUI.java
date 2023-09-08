@@ -47,7 +47,7 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         AffineTransform transform = getGraphicsConfiguration().getDefaultTransform();
         double scaleX = transform.getScaleX();
         double scaleY = transform.getScaleY();
-        setSize((int)(options.displayWidth()/scaleX), (int)(options.displayHeight()/scaleY));
+        setSize((int) (options.displayWidth() / scaleX), (int) (options.displayHeight() / scaleY));
         setAlwaysOnTop(true);
         String randTitle = "EyeSee " + new Random().nextInt();
         setTitle(randTitle);
@@ -59,28 +59,36 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    public static void main(String[] args) {
+        new EyeSeeGUI();
+    }
+
     private void tick() {
         EyeSeeOptions options = EyeSeeOptions.getInstance();
         KeyboardUtil.tick(options.hotkey);
-        boolean hotkeyPressed = KeyboardUtil.wasPressed();
-        if (hotkeyPressed) lastKeyPress = System.currentTimeMillis();
-        if (System.currentTimeMillis() - lastKeyPress > options.disappearAfter) {
-            if (currentlyShowing) {
-                System.out.println("Hiding...");
-                currentlyShowing = false;
-                HwndUtil.minimize(eyeSeeHwnd.getPointer());
+        if (options.useToggle) {
+            // Toggle style
+            if (KeyboardUtil.wasPressed()) {
+                currentlyShowing = !currentlyShowing;
+                if (currentlyShowing) {
+                    showEyeSee();
+                } else {
+                    hideEyeSee();
+                    return;
+                }
             }
-            return;
-        } else if (hotkeyPressed) {
-            currentlyShowing = !currentlyShowing;
-            if (currentlyShowing) {
-                System.out.println("Showing...");
-                currentlyShowing = true;
-                HwndUtil.unminimizeNoActivate(eyeSeeHwnd.getPointer());
-            } else {
-                System.out.println("Hiding...");
-                currentlyShowing = false;
-                HwndUtil.minimize(eyeSeeHwnd.getPointer());
+        } else {
+            // Non toggle style
+            long currentTime = System.currentTimeMillis();
+            if (KeyboardUtil.isKeyDown()) {
+                lastKeyPress = currentTime;
+                if (!currentlyShowing) {
+                    showEyeSee();
+                }
+            } else if (currentTime - lastKeyPress > options.disappearAfter) {
+                if (currentlyShowing) {
+                    hideEyeSee();
+                }
                 return;
             }
         }
@@ -101,6 +109,18 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         User32.INSTANCE.ReleaseDC(eyeSeeHwnd, eyeSeeHDC);
     }
 
+    private void showEyeSee() {
+        System.out.println("Showing...");
+        currentlyShowing = true;
+        HwndUtil.unminimizeNoActivate(eyeSeeHwnd.getPointer());
+    }
+
+    private void hideEyeSee() {
+        System.out.println("Hiding...");
+        currentlyShowing = false;
+        HwndUtil.minimize(eyeSeeHwnd.getPointer());
+    }
+
     private Rectangle getYoinkArea(WinDef.HWND hwnd, EyeSeeOptions options) {
         Rectangle rectangle;
         if (hwnd == null) {
@@ -111,10 +131,6 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         int width = options.viewportWidth;
         int height = options.viewportHeight;
         return new Rectangle((int) rectangle.getCenterX() - width / 2, (int) rectangle.getCenterY() - height / 2, width, height);
-    }
-
-    public static void main(String[] args) {
-        new EyeSeeGUI();
     }
 
     @Override

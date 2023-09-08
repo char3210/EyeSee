@@ -21,6 +21,7 @@ public final class KeyboardUtil {
     private static final String[] KEY_NAMES = getKeyNamesArray();
     //assume a single hotkey
     private static boolean wasDown = false;
+    private static boolean isDown = false;
     private static int pressCount = 0;
 
     private KeyboardUtil() {
@@ -110,7 +111,7 @@ public final class KeyboardUtil {
     public static List<Integer> getPressedKeys() {
         List<Integer> initPressedKeys = new ArrayList<>();
         for (int vKey = 1; vKey <= 0xFE; vKey++) {
-            if (isPressed(vKey)) {
+            if (checkPressed(vKey)) {
                 initPressedKeys.add(vKey);
             }
         }
@@ -131,16 +132,22 @@ public final class KeyboardUtil {
         return pressedKeys;
     }
 
-    public static boolean isPressed(int vKey) {
+    public static boolean checkPressed(int vKey) {
         return User32.INSTANCE.GetAsyncKeyState(vKey) < 0;
+    }
+
+
+    public static boolean isKeyDown() {
+        return isDown;
     }
 
     /**
      * updates the hotkey pressed state
+     *
      * @param vKey the hotkey
      */
     public static void tick(int vKey) {
-        boolean isDown = isPressed(vKey);
+        isDown = checkPressed(vKey);
         if (isDown && !wasDown) {
             pressCount++;
         }
@@ -148,7 +155,6 @@ public final class KeyboardUtil {
     }
 
     /**
-     *
      * @return whether the hotkey (defined and updated by {@linkplain KeyboardUtil#tick(int)})
      * was pressed since the last call
      */

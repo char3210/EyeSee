@@ -184,6 +184,7 @@ public final class HwndUtil {
      * DO NOT use this method unless you are certain that the window will be present.
      *
      * @param exactName the exact name of the window
+     *
      * @return the window handle
      */
     public static Pointer waitForWindow(String exactName) {
