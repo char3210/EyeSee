@@ -8,9 +8,12 @@ import xyz.duncanruns.eyesee.win32.User32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -57,10 +60,26 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         tick();
         executor.scheduleAtFixedRate(this::tick, 50_000_000, 1_000_000_000L / options.refreshRate, TimeUnit.NANOSECONDS);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyChar() == 'o') {
+                    editOptions();
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
         new EyeSeeGUI();
+    }
+
+    private void editOptions() {
+        try {
+            Desktop.getDesktop().open(EyeSeeOptions.getOptionsPath().toFile());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void tick() {

@@ -39,7 +39,7 @@ public class EyeSeeOptions {
         return GSON.fromJson(jsonString, EyeSeeOptions.class);
     }
 
-    private static Path getOptionsPath() {
+    public static Path getOptionsPath() {
         return Paths.get(System.getProperty("user.home")).resolve(".EyeSee").resolve("options.json");
     }
 
