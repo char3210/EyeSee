@@ -74,7 +74,6 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
                     showEyeSee();
                 } else {
                     hideEyeSee();
-                    return;
                 }
             }
         } else {
@@ -89,9 +88,10 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
                 if (currentlyShowing) {
                     hideEyeSee();
                 }
-                return;
             }
         }
+
+        if (!currentlyShowing) return;
 
         WinDef.HWND sourceHwnd = null;
         if (useForeground) {
