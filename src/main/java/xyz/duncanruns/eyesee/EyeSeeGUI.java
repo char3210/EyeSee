@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,7 +43,11 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         setLocation(options.x, options.y);
         addWindowListener(this);
         setResizable(false);
-        setSize(options.displayWidth(), options.displayHeight());
+        // make the window size the same units StretchBlt uses (physical pixels)
+        AffineTransform transform = getGraphicsConfiguration().getDefaultTransform();
+        double scaleX = transform.getScaleX();
+        double scaleY = transform.getScaleY();
+        setSize((int)(options.displayWidth()/scaleX), (int)(options.displayHeight()/scaleY));
         setAlwaysOnTop(true);
         String randTitle = "EyeSee " + new Random().nextInt();
         setTitle(randTitle);
