@@ -7,6 +7,7 @@ import com.sun.jna.platform.win32.GDI32;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinDef.HDC;
+import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.win32.W32APIOptions;
 
 /**
@@ -33,6 +34,20 @@ public interface GDI32Extra extends GDI32 {
     boolean GetColorAdjustment(HDC hdc, COLORADJUSTMENT lpca);
 
     boolean SetColorAdjustment(HDC hdc, COLORADJUSTMENT lpca);
+
+    boolean Rectangle(HDC hdc, int left, int top, int right, int bottom);
+
+    WinDef.HPEN CreatePen(int iStyle, int cWidth, long color);
+
+//    WinNT.HANDLE SelectObject(HDC hdc, WinNT.HANDLE h);
+
+    WinDef.HBRUSH CreateSolidBrush(long color);
+
+    double SetDCPenColor(HDC hdc, long color);
+
+    boolean MoveToEx(HDC hdc, int x, int y, Pointer lppt);
+
+    boolean LineTo(HDC hdc, int x, int y);
 
     @Structure.FieldOrder({"caSize", "caFlags", "caIlluminantIndex", "caRedGamma", "caGreenGamma", "caBlueGamma", "caReferenceBlack", "caReferenceWhite", "caContrast", "caBrightness", "caColorfulness", "caRedGreenTint"})
     class COLORADJUSTMENT extends Structure {

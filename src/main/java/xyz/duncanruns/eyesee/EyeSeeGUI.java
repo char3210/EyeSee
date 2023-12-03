@@ -24,6 +24,12 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
     private static final Robot ROBOT;
     private static final WinDef.DWORD SRCCOPY = new WinDef.DWORD(0x00CC0020);
 
+    WinDef.HBRUSH GRAY = GDI32Extra.INSTANCE.CreateSolidBrush(0x00aaaaaa);
+    WinDef.HBRUSH WHITE = GDI32Extra.INSTANCE.CreateSolidBrush(0x00ffffff);
+
+    WinDef.HBRUSH RED = GDI32Extra.INSTANCE.CreateSolidBrush(0x000000ff);
+    WinDef.HPEN hpen = GDI32Extra.INSTANCE.CreatePen(5, 0, 0);
+
     static {
         try {
             ROBOT = new Robot();
@@ -123,6 +129,24 @@ public class EyeSeeGUI extends JFrame implements WindowListener {
         GDI32Extra.INSTANCE.SetStretchBltMode(eyeSeeHDC, 3);
 
         GDI32Extra.INSTANCE.StretchBlt(eyeSeeHDC, 0, 0, options.displayWidth(), options.displayHeight(), sourceHDC, rectangle.x, rectangle.y, rectangle.width, rectangle.height, SRCCOPY);
+
+        GDI32Extra.INSTANCE.SelectObject(eyeSeeHDC, hpen);
+
+        //grid
+        for (int col = 0; col < options.viewportWidth; col++) {
+            if ((col - options.viewportWidth/2) % 5 == 0) {
+                GDI32Extra.INSTANCE.SelectObject(eyeSeeHDC, WHITE);
+            } else {
+                GDI32Extra.INSTANCE.SelectObject(eyeSeeHDC, GRAY);
+            }
+            GDI32Extra.INSTANCE.Rectangle(eyeSeeHDC, (int) (col*options.scaleFactor)-1, 0, (int) (col*options.scaleFactor)+1, options.displayHeight());
+        }
+
+        //crosshair
+        GDI32Extra.INSTANCE.SelectObject(eyeSeeHDC, RED);
+        int mid = options.displayWidth()/2;
+        GDI32Extra.INSTANCE.Rectangle(eyeSeeHDC, mid-2, 0, mid+2, options.displayHeight());
+
 
         User32.INSTANCE.ReleaseDC(sourceHwnd, sourceHDC);
         User32.INSTANCE.ReleaseDC(eyeSeeHwnd, eyeSeeHDC);
